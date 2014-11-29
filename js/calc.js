@@ -1,94 +1,86 @@
 var calculator = {
 
   init: function() {
-    //retrieve the display textfield
-    this.txtDisplay = document.getElementById("display");
 
-    //retrieve the operation buttons
-    this.plus = document.getElementById("plus");
-    this.minus = document.getElementById("minus");
-    this.multiply = document.getElementById("multiply");
-    this.divide = document.getElementById("divide");
-    this.equals = document.getElementById("equals");
-
-    //retrieve the number buttons
-    this.numZero = document.getElementById("zero");
-    this.numOne = document.getElementById("one");
-    this.numTwo = document.getElementById("two");
-    this.numThree = document.getElementById("three");
-    this.numFour = document.getElementById("four");
-    this.numFive = document.getElementById("five");
-    this.numSix = document.getElementById("six");
-    this.numSeven = document.getElementById("seven");
-    this.numEight = document.getElementById("eight");
-    this.numNine = document.getElementById("nine");
-
-    //create an empty array
+    //create an empty array that will store the operands...
+    //...and the operator needed to calculate result for any operation
+    //this.operands[0] = Operand to be operated on
+    //this.operands[1] = Operator to be used for the operation
+    //this.operands[2] = 2nd operand in the operation
     this.operands = new Array(3);
+    this.operands[0] = null;
 
-    //set event listeners for the operators
-    this.setOperatorListener(this.plus);
-    this.setOperatorListener(this.minus);
-    this.setOperatorListener(this.multiply);
-    this.setOperatorListener(this.divide);
+    //retrieve the display textfield and the equals button
+    this.txtDisplay = document.getElementById("display");
+    this.btnEquals = document.getElementById("equals");
+    this.btnClear = document.getElementById("clear");
+    this.btnDot = document.getElementById("dot");
+    this.btnPercent = document.getElementById("percent");
+    this.setDotListener();
     this.setEqualsListener();
+    this.setClearListener();
 
-    //set event listeners for the numbers
-    this.setNumberListener(this.numZero);
-    this.setNumberListener(this.numOne);
-    this.setNumberListener(this.numTwo);
-    this.setNumberListener(this.numThree);
-    this.setNumberListener(this.numFour);
-    this.setNumberListener(this.numFive);
-    this.setNumberListener(this.numSix);
-    this.setNumberListener(this.numSeven);
-    this.setNumberListener(this.numEight);
-    this.setNumberListener(this.numNine);
+    //retrieve the number/operator buttons, then,
+    //loop through the buttons by their respective classNames
+    //and add the setNumberListener()/setOperatorListener() event on each
+    this.numbers = document.getElementsByClassName('digit');
+    for(var i = 0; i < this.numbers.length; i++) {
+      this.setNumberListener(this.numbers[i]);
+    }
+
+    this.operators = document.getElementsByClassName('operator');
+    for(var j = 0; j < this.operators.length; j++) {
+      this.setOperatorListener(this.operators[j]);
+    }
+  },
+
+  setClearListener: function() {
+    var self = this;
+    self.btnClear.onclick = function() {
+      self.operands.splice(0, 3);
+      self.txtDisplay.value = "0";
+    };
+  },
+
+  setDotListener: function() {
+    var self = this;
+    self.btnDot.onclick = function() {
+      if(calculator.operands[1] == null) {
+        var dot = calculator.operands[0].indexOf(".");
+        if(dot < 0) {
+          calculator.operands[0] = calculator.operands[0] + self.btnDot.value;
+          var text = self.txtDisplay.value + self.btnDot.value;
+          return self.txtDisplay.value = text;
+        }
+        else {
+          return;
+        }
+      }
+      else {
+        var dot = calculator.operands[2].indexOf(".");
+        if(dot < 0) {
+          calculator.operands[2] = calculator.operands[2] + self.btnDot.value;
+          var text = self.txtDisplay.value + self.btnDot.value;
+          return self.txtDisplay.value = text;
+        }
+        else {
+          return;
+        }
+      }
+    };
+  },
+
+  setPercentListener: function() {
+
   },
 
   setOperatorListener: function(operator) {
     var self = this;
     operator.onclick = function() {
-      var text = self.txtDisplay.value + operator.value;
+      var text = operator.value;
       calculator.operands[1] = operator.value;
       console.log(calculator.operands[1]);
       return self.txtDisplay.value = text;
-    };
-  },
-
-  setEqualsListener: function() {
-    var self = this;
-    self.equals.onclick = function() {
-      var operands = calculator.operands;
-      console.log(operands);
-
-      if(operands[1] == "+") {
-        var result = parseInt(operands[0]) + parseInt(operands[2]);
-        console.log(result);
-        self.txtDisplay.value = result;
-        return calculator.operands.splice(0, 3);
-      }
-
-      else if(operands[1] == "-") {
-        var result = parseInt(operands[0]) - parseInt(operands[2]);
-        console.log(result);
-        self.txtDisplay.value = result;
-        return calculator.operands.splice(0, 3);
-      }
-
-      else if(operands[1] == "*") {
-        var result = parseInt(operands[0]) * parseInt(operands[2]);
-        console.log(result);
-        self.txtDisplay.value = result;
-        return calculator.operands.splice(0, 3);
-      }
-
-      else if(operands[1] == "/") {
-        var result = parseInt(operands[0]) / parseInt(operands[2]);
-        console.log(result);
-        self.txtDisplay.value = result;
-        return calculator.operands.splice(0, 3);
-      }
     };
   },
 
@@ -125,6 +117,82 @@ var calculator = {
           calculator.operands[2] = number.value;
           console.log(calculator.operands[2]);
           return self.txtDisplay.value = number.value;
+        }
+      }
+    };
+  },
+
+  setEqualsListener: function() {
+    var self = this;
+    self.btnEquals.onclick = function() {
+      var operands = calculator.operands;
+      console.log(operands);
+
+      if(operands[1] == "+") {
+
+        if(operands[0].indexOf(".") > 0 || operands[2].indexOf(".") > 0) {
+          var result = parseFloat(operands[0]) + parseFloat(operands[2]);
+          console.log(result);
+          self.txtDisplay.value = result;
+          return calculator.operands.splice(0, 3);
+        }
+
+        else {
+          var result = parseInt(operands[0]) + parseInt(operands[2]);
+          console.log(result);
+          self.txtDisplay.value = result;
+          return calculator.operands.splice(0, 3);
+        }
+      }
+
+      else if(operands[1] == "-") {
+
+        if(operands[0].indexOf(".") > 0 || operands[2].indexOf(".") > 0) {
+          var result = parseFloat(operands[0]) - parseFloat(operands[2]);
+          console.log(result);
+          self.txtDisplay.value = result;
+          return calculator.operands.splice(0, 3);
+        }
+
+        else {
+          var result = parseInt(operands[0]) - parseInt(operands[2]);
+          console.log(result);
+          self.txtDisplay.value = result;
+          return calculator.operands.splice(0, 3);
+        }
+      }
+
+      else if(operands[1] == "*") {
+
+        if(operands[0].indexOf(".") > 0 || operands[2].indexOf(".") > 0) {
+          var result = parseFloat(operands[0]) * parseFloat(operands[2]);
+          console.log(result);
+          self.txtDisplay.value = result;
+          return calculator.operands.splice(0, 3);
+        }
+
+        else {
+          var result = parseInt(operands[0]) * parseInt(operands[2]);
+          console.log(result);
+          self.txtDisplay.value = result;
+          return calculator.operands.splice(0, 3);
+        }
+      }
+
+      else if(operands[1] == "/") {
+
+        if(operands[0].indexOf(".") > 0 || operands[2].indexOf(".") > 0) {
+          var result = parseFloat(operands[0]) / parseFloat(operands[2]);
+          console.log(result);
+          self.txtDisplay.value = result;
+          return calculator.operands.splice(0, 3);
+        }
+
+        else {
+          var result = parseInt(operands[0]) / parseInt(operands[2]);
+          console.log(result);
+          self.txtDisplay.value = result;
+          return calculator.operands.splice(0, 3);
         }
       }
     };

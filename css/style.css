@@ -4,6 +4,10 @@ form {
   /*border: 1px solid red;*/
 }
 
+button:focus {
+  outline: none;
+}
+
 #textboxes input {
   margin: 5px 0;
   padding-right: 5px;
